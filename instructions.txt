@@ -1,0 +1,41 @@
+This Todo app is made using
+
+Front-End : HTML , Css , Ejs
+
+Back-End : Node , Express
+
+Database : MongoDb
+-----------------------------------------------------
+How to Run
+
+1) After downloading run command "npm i node modules"
+2) then run "nodemon app.js" or "node app.js"
+3) run " http://localhost:8080/ " on google chrome
+
+-----------------------------------------------------
+Instructions for how to use
+
+1) Upper box is to create new task
+
+2) Lower box shows all tasks
+
+3) Tasks are prioritized by End Date
+
+4) To update each row has a select box showing current status. You can change status by selecting from dropdown
+
+5) To delete each row has a checkbox. Click on checkbox or checkboxes and Press " DELETE TASK "
+
+6) To see prnding tasks, press " Pending Tasks "
+
+7) Press " Back " to go Back
+
+----------------------------------------------------
+Files Definition
+
+1) " views -> home.ejs " is the landinf web page
+
+2) " app.js " is the back-end server Files
+
+3) " models -> task.js " is the schema Files
+
+4) " config -> mongoose.js " is the conection file

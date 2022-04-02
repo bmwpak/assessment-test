@@ -1,0 +1,241 @@
+<html>
+
+    <head>
+        <title>
+            
+            <%= title %>
+
+        </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+         <!-- font awesome link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css">
+    </head>
+   <script src=" https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <body>
+<section class="container">
+        <h1 align="center">TODO APP</h1>
+
+            <!-- form to create task -->
+        <form action="/create-task" method="POST">
+
+            <table class="table">
+                <thead>
+                  <tr class="table-active">
+                    <th >Task Definition</th>
+                    <th >End Date</th>
+                    <th >Created By Info.</th>
+                  </tr>
+                </thead>
+            
+            
+                <tbody>
+                    <tr>
+                      <td> <input type="text" name="definition" placeholder="Task Definition" required /></td>
+                      
+                      <td > <input type="date" name="endDate" required /></td>
+                      <td > <input type="text" name="name" placeholder="Your Name" required />
+                        <input type="email" name="email" placeholder="Your Email" required />
+                        <input type="number" name="phone" placeholder="Your Contact" required /></td>
+                      
+                    </tr>
+                    <tr>
+                        <td ><input type="submit"  class="btn btn-success"id="add" value="ADD TASK" /></td>
+                    </tr>
+                </tbody>
+            
+            </table>
+                  
+  </form>
+    </section>
+        <div align="center">          
+                <h1 align="center">TASKS LIST</h1>
+
+                <form action="/delete-task" method="GET">
+                    <table class="table" style="width: 80%;">
+                        <thead>
+                            <tr>
+                              <th>Select</th>
+                              <th>Name</th>
+                              <th>Priority</th>
+                              <th>Due date</th>
+                              <th>Status</th>
+                            </tr>
+                          </thead>
+                          <tbody id="tbody">
+                              
+                            <!-- sorting by End Dates -->
+                              <%
+                              function compare( a, b ) {
+                        
+                                return new Date(a.endDate) - new Date(b.endDate);
+                                }
+
+                                task.sort(compare);
+                                var count = 0; %>
+
+                                <!-- show tasks -->
+                        <% for(let i of task) { %>
+                            
+                            <tr>
+                                <td> <input type="checkbox" name="<%= i._id %>" ></td>
+                                <td> <p id="name"><%= i.name %></td>
+                                <td><p id="priority"><%= count %></p></td>
+                                <td><p id="end-date"> <%= i.endDate %></p></td>
+                                <td><p id="status"><select onchange="changed(this.value, <%=JSON.stringify(i._id)%>)" name="status" required>
+
+                                    <option><%= i.status %></option>
+                                     
+                                    <!-- checking the status then printing the second status e.g
+                                    if status is pending then second option will be complete -->
+                                        <% if(i.status == 'pending'){ %>
+                                            <option>complete</option>
+                                            <%}else{%>
+                                                <option>pending</option>
+                                                <% } %>
+            
+                                </select></p></td>
+                            </tr>
+                    <!-- to show priority count -->
+                        <% count++;
+                        } %>
+                            
+                        </tbody>
+
+                           
+                    </table>
+                    <div  align="center" ><input type="submit" class="btn btn-danger" value="DELETE TASK"/>
+                </div>
+            </form>
+                <div  align="center" >
+                    <input type="button" class="btn" value="Pending Tasks"
+                     onclick="pendingTasks()" style="border: 1px solid black;" />
+
+                    <input type="button" class="btn" value="Back"
+                     onclick='window.location.href = "/"' style="border: 1px solid black;" />
+                </div>
+            </div>
+            <script>
+
+                // for updating status
+                async function changed(status,id){
+                   
+                    const res = await fetch('/update-status' , {
+                    method:"POST",
+                    headers:{
+                        "Content-Type":"application/json"
+                    },
+                    body:JSON.stringify({
+                        id:id,
+                        status : status
+                    })
+                    
+                });
+    
+             
+
+                const response = await res.json();
+        
+                if(res.status === 400 || !response)
+                {
+                    alert("error in updating!");
+                }else{
+                }
+            }
+
+            // for showing pending tasks
+            async function pendingTasks(){
+                    
+                    const res = await fetch('/pending-tasks' , {
+                method:"GET",
+                headers:{
+                    "Content-Type":"application/json"
+                },                
+            });
+    
+             
+
+            const response = await res.json();
+
+            let tasks = "<%= JSON.stringify(task[0]._id) %>";
+    
+            if(res.status === 400 || !response)
+            {
+                alert("error in updating!");
+            }else{
+
+                // for sorting by End Date
+                function compare( a, b ) {
+                        
+                    return new Date(a.endDate) - new Date(b.endDate);
+                }
+                response.sort( compare );
+
+                var pending_btn = document.getElementById("tbody");
+                
+                var tbody = document.getElementById("tbody");
+                
+                tbody.innerHTML = "";
+
+                for( var i = 0 ; i < response.length ; i++ ){
+
+                    // creating tr
+                    var tr = document.createElement('tr');
+
+                    // creating checkbox
+                    var td0 = document.createElement('td');
+                    var checkbox = document.createElement('input');
+                    checkbox.type = "checkbox";
+                    checkbox.name = response[i]._id;
+
+                    td0.append(checkbox);
+                    tr.append(td0);
+
+                    //creating name box 
+                    var td1 = document.createElement('td');
+                    var name = document.createElement('p');
+                    name.id = "name";
+                    name.innerText = response[i].name;
+
+                    td1.append(name);
+                    tr.append(td1);
+
+                    //creating priority box
+                    var td2 = document.createElement('td');
+                    var priority = document.createElement('p');
+                    priority.id = "priority";
+                    priority.innerText = i;
+
+                    td2.append(priority);
+                    tr.append(td2);
+
+                    // creating End Date box
+                    var td3 = document.createElement('td');
+                    var endDate = document.createElement('p');
+                    endDate.id = "endDate";
+                    endDate.innerText = response[i].endDate;
+
+                    td3.append(endDate);
+                    tr.append(td3);
+
+                    // for status
+                    var td4 = document.createElement('td');
+                    var status = document.createElement('p');
+                    status.innerText = response[i].status; 
+                    td4.append(status);
+                    tr.append(td4);
+
+                    // append tr 
+                    tbody.append(tr);
+
+                }
+                
+                
+            }
+                }
+            </script>
+    </body>
+    
+</html>
